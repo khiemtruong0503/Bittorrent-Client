@@ -24,7 +24,7 @@ json decode_bencoded_value(const std::string& encoded_value) {
     else if (encoded_value[0] == 'i') {
         size_t e_index = encoded_value.find('e');
         if(e_index != std::string::npos) { 
-            std::string integer_number = encoded_value.substr(1, e_index - 1);
+            int64_t integer_number = std::stoll(encoded_value.substr(1, e_index - 1));
             return json(integer_number);
         }
     } 
