@@ -5,7 +5,7 @@
 using namespace std;
 
 int main() { 
-    string encoded_value = "l5:helloi52e";
+    string encoded_value = "l";
     string ans = "[";
     size_t found_element = encoded_value.find_first_of(":i");
     
@@ -19,12 +19,14 @@ int main() {
                 }
             }
             // get the string
-            string str = "\"";
+            string str;
             for(int i = found_element + 1; i <= found_element + string_number; ++i) { 
                 str += encoded_value[i];
             }
-            str += '\"';
-            ans += str;
+            // str += '\"';
+            if(str.size() > 0) { 
+                ans += str;
+            }
             ans += ',';
         }   
         else if(encoded_value[found_element] == 'i') { 
@@ -51,7 +53,9 @@ int main() {
         found_element = encoded_value.find_first_of(":i", found_element + 1);
     }
 
-    ans.erase(ans.size() - 1);
+    if(ans[ans.size() - 1] == ',') { 
+            ans.erase(ans.size() - 1); // erase the last comma ','
+        }
     ans += ']';
 
     cout << ans;

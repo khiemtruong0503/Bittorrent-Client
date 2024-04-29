@@ -42,12 +42,12 @@ json decode_bencoded_value(const std::string& encoded_value) {
                     } 
                 }
                 //? get the string
-                std::string s = "\"";
+                std::string s;
                 for(int i = found_element + 1; i <= found_element + number_string; ++i) { 
                     s += encoded_value[i];
                 }
-                s += '\"';
-                if(s.size() > 2) { 
+                // s += '\"';
+                if(!s.empty()) { 
                     str += s;
                 }
                 str += ',';
