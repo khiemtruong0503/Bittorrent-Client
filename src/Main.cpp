@@ -195,25 +195,35 @@ std::string read_file(const std::string &file_path) {
     }
 }
 
+// Function to convert binary data to a hexadecimal string
+std::string to_hex_string(const std::string &binary) { 
+    std::ostringstream hex;
+    hex << std::hex << std::setfill('0');
+    for (unsigned char byte : binary) { 
+        hex << std::setw(2) << static_cast<int>(byte);
+    }
+    return hex.str();
+}
 // parse torrent file, return tracker_url and length
 void parse_torrent(const std::string &file_path) { 
     std::string content = read_file(file_path);
     json decoded_torrent = decode_bencoded_value(content);
 
-    std::string bencoded_info = json_to_bencode(decoded_torrent["info"]);
+    std::string tracker_url = decoded_torrent["announce"];
+    int length = decoded_torrent["info"]["length"];
 
+    std::cout << "Tracker URL: " << tracker_url << std::endl;
+    std::cout << "Length: " << length << std::endl;
+
+    std::string bencoded_info = json_to_bencode(decoded_torrent["info"]);
     SHA1 sha1;
     sha1.update(bencoded_info);
     std::string info_hash = sha1.final();
     
-    std::string piece_length = decoded_torrent["piece length"];
-
-    std::string tracker_url = decoded_torrent["announce"];
-    int length = decoded_torrent["info"]["length"];
-    std::cout << "Tracker URL: " << tracker_url << std::endl;
-    std::cout << "Length: " << length << std::endl;
-    std::cout << "Info Hash: " << info_hash << std::endl;
-    std::cout << "Piece Length: " << piece_length;
+    int piece_length = decoded_torrent["info"]["piece length"];
+    std::string piece_hashes = to_hex_string(decoded_torrent["info"]["pieces"]);
+    std::cout << "Piece Length: " << piece_length << std::endl;
+    std::cout << "Piece Hashes: " << piece_hashes << std::endl;
 }
 
 std::string json_to_bencode(const json &j) { 
