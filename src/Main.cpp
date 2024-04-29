@@ -47,7 +47,9 @@ json decode_bencoded_value(const std::string& encoded_value) {
                     s += encoded_value[i];
                 }
                 s += '\"';
-                str += s;
+                if(s.size() > 2) { 
+                    str += s;
+                }
                 str += ',';
             }
             else if(encoded_value[found_element] == 'i'){ // found an integer element 
