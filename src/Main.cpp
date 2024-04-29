@@ -74,7 +74,9 @@ json decode_bencoded_value(const std::string& encoded_value) {
             found_element = encoded_value.find_first_of(":i", found_element + 1);
         }
         
-        str.erase(str.size() - 1); // erase the last comma ','
+        if(str[str.size() - 1] == ',') { 
+            str.erase(str.size() - 1); // erase the last comma ','
+        }
         str += "]";
 
         return json(str);
