@@ -99,7 +99,7 @@ json decode_string(const std::string &, size_t &);
 json decode_list(const std::string &, size_t &);
 json decode_dictionary(const std::string &, size_t &);
 json decode_value(const std::string &, size_t &);
-
+std::string json_to_bencode(const json &);
 
 
 json decode_integer(const std::string& encoded_value, size_t &index) {
