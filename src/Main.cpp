@@ -89,23 +89,7 @@ using json = nlohmann::json;
 //     }
 // }
 
-json decode_value(const std::string &encoded_value, size_t &index) { 
-    char type = encoded_value[index];
-    switch (type) { 
-        case 'i':
-            return decode_integer(encoded_value, index);
-        case 'l': 
-            return decode_list(encoded_value, index);
-        case 'd': 
-            return decode_dictionary(encoded_value, index);
-        default:
-            if (std::isdigit(type)) { 
-                return decode_string(encoded_value, index);
-            } else { 
-                throw std::runtime_error("Invalid encoded value.");
-            }
-    }
-}
+
 
 json decode_integer(const std::string& encoded_value, size_t &index) {
     size_t start = index + 1;
@@ -177,6 +161,24 @@ json decode_dictionary(const std::string &encoded_value, size_t &index) {
 //         throw std::runtime_error("Invalid encodede value.");
 //     }
 // }
+
+json decode_value(const std::string &encoded_value, size_t &index) { 
+    char type = encoded_value[index];
+    switch (type) { 
+        case 'i':
+            return decode_integer(encoded_value, index);
+        case 'l': 
+            return decode_list(encoded_value, index);
+        case 'd': 
+            return decode_dictionary(encoded_value, index);
+        default:
+            if (std::isdigit(type)) { 
+                return decode_string(encoded_value, index);
+            } else { 
+                throw std::runtime_error("Invalid encoded value.");
+            }
+    }
+}
 
 json decode_bencoded_value(const std::string& encoded_value) { 
     size_t index = 0; // start index for parsing
