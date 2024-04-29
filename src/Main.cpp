@@ -107,7 +107,7 @@ json decode_string(const std::string& encoded_value, size_t &index) {
     // Ex: 5:Hello -> Hello
     size_t colon_index = encoded_value.find(':', index);
     if (colon_index != std::string::npos) { 
-        std::string number_string = encoded_value.substr(index, colon_index - 1);
+        std::string number_string = encoded_value.substr(index, colon_index - index);
         int64_t number = std::atoll(number_string.c_str());
         std::string str = encoded_value.substr(colon_index + 1, number);
 
