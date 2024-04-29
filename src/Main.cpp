@@ -9,7 +9,7 @@
 using json = nlohmann::json;
 
 json decode_bencoded_value(const std::string& encoded_value) {
-    if (std::isdigit(encoded_value[0])) {
+    if (std::isdigit(encoded_value[0])) { // string "5:Hello" -> "Hello"
         // Example: "5:hello" -> "hello"
         size_t colon_index = encoded_value.find(':');
         if (colon_index != std::string::npos) {
@@ -21,13 +21,63 @@ json decode_bencoded_value(const std::string& encoded_value) {
             throw std::runtime_error("Invalid encoded value: " + encoded_value);
         }
     }
-    else if (encoded_value[0] == 'i') {
+    else if (encoded_value[0] == 'i') { // integer "i52e" -> 52
         size_t e_index = encoded_value.find('e');
         if(e_index != std::string::npos) { 
             int64_t integer_number = std::stoll(encoded_value.substr(1, e_index - 1));
             return json(integer_number);
         }
     } 
+    else if (encoded_value[0] == 'l') { // list "l5:helloi52e" -> ["hello", 52]
+        std::string str = "[";
+        size_t found_element = encoded_value.find_first_of(":i");
+
+        while(found_element != std::string::npos) { 
+            if(encoded_value[found_element] == ':') { // found a string element
+                //? get string's length
+                int64_t number_string = encoded_value[found_element - 1] - 48;
+                for(int i = found_element - 2; i >= 0; --i) { 
+                    if(isdigit(encoded_value[i])) { 
+                        number_string += (encoded_value[i] - 48) * 10;
+                    } 
+                }
+                //? get the string
+                std::string s = "\"";
+                for(int i = found_element + 1; i <= found_element + number_string; ++i) { 
+                    s += encoded_value[i];
+                }
+                s += '\"';
+                str += s;
+                str += ',';
+            }
+            else if(encoded_value[found_element] == 'i'){ // found an integer element 
+                //? find trailing 'e'
+                size_t find_e = encoded_value.find('e', found_element + 1);
+
+                if(find_e != std::string::npos) { 
+                    //? check if number is negative
+                    bool isNegative = encoded_value[found_element + 1] == '-' ? true : false;
+
+                    int64_t number_length = isNegative ? (find_e - found_element - 2) : (find_e - found_element - 1);
+                    int64_t number = isNegative ? stoll(encoded_value.substr(found_element + 2, number_length)) : stoll(encoded_value.substr(found_element + 1, number_length));
+
+                    if((int)(log10(number)) + 1 < number_length) { // there is leading '0' in the number. Ex: i003e
+                        number = 0;
+                    }
+
+                    isNegative ? number *= -1 : 0;
+                    str += std::to_string(number);
+                }
+            }
+
+            found_element = encoded_value.find_first_of(":i", found_element + 1);
+        }
+        
+        str.erase(str.size() - 1); // erase the last comma ','
+        str += "]";
+
+        return json(str);
+    }
     else {
         throw std::runtime_error("Unhandled encoded value: " + encoded_value);
     }
