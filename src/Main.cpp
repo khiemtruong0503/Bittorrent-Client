@@ -205,7 +205,7 @@ void parse_torrent(const std::string &file_path) {
     SHA1 sha1;
     sha1.update(bencoded_info);
     std::string info_hash = sha1.final();
-    std::cout << "Info hash: " << info_hash << std::endl;
+    std::cout << "Info hash: " << info_hash;
 
     std::string tracker_url = decoded_torrent["announce"];
     int length = decoded_torrent["info"]["length"];
