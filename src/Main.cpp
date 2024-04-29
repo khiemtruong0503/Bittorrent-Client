@@ -209,8 +209,8 @@ void parse_torrent(const std::string &file_path) {
 
     std::string tracker_url = decoded_torrent["announce"];
     int length = decoded_torrent["info"]["length"];
-    std::cout << "Tracker URL: " << tracker_url << std::endl;
-    std::cout << "Length: " << length << std::endl;
+    // std::cout << "Tracker URL: " << tracker_url << std::endl;
+    // std::cout << "Length: " << length << std::endl;
 }
 
 std::string json_to_bencode(const json &j) { 
