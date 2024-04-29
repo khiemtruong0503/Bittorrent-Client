@@ -29,7 +29,7 @@ json decode_bencoded_value(const std::string& encoded_value) {
         }
     } 
     else if (encoded_value[0] == 'l') { // list "l5:helloi52e" -> ["hello", 52]
-        std::string str;
+        std::string str = "[";
         size_t found_element = encoded_value.find_first_of(":i");
 
         while(found_element != std::string::npos) { 
@@ -67,6 +67,7 @@ json decode_bencoded_value(const std::string& encoded_value) {
 
                     isNegative ? number *= -1 : 0;
                     str += std::to_string(number);
+                    str += ','
                 }
             }
 
@@ -74,7 +75,7 @@ json decode_bencoded_value(const std::string& encoded_value) {
         }
         
         str.erase(str.size() - 1); // erase the last comma ','
-        // str += "]";
+        str += "]";
 
         return json(str);
     }

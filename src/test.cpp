@@ -5,8 +5,8 @@
 using namespace std;
 
 int main() { 
-    string encoded_value = "l7:hello-02e";
-
+    string encoded_value = "l5:helloi52e";
+    string ans = "[";
     size_t found_element = encoded_value.find_first_of(":i");
     
     while(found_element != string::npos) { 
@@ -19,11 +19,13 @@ int main() {
                 }
             }
             // get the string
-            string str;
+            string str = "\"";
             for(int i = found_element + 1; i <= found_element + string_number; ++i) { 
                 str += encoded_value[i];
             }
-            cout << str << ",";
+            str += '\"';
+            ans += str;
+            ans += ',';
         }   
         else if(encoded_value[found_element] == 'i') { 
             // find trailing 'e'
@@ -41,10 +43,16 @@ int main() {
                 }
 
                 isNegative ? number *= -1 : 0;
-                cout << number << ',';
+                ans += to_string(number);
+                ans += ',';
             }
         }
 
         found_element = encoded_value.find_first_of(":i", found_element + 1);
     }
+
+    ans.erase(ans.size() - 1);
+    ans += ']';
+
+    cout << ans;
 }
