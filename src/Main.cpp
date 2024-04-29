@@ -222,6 +222,7 @@ void parse_torrent(const std::string &file_path) {
     
     int piece_length = decoded_torrent["info"]["piece length"];
     std::string piece_hashes = to_hex_string(decoded_torrent["info"]["pieces"]);
+    std::cout << "Info Hash: " << piece_hashes << std::endl;
     std::cout << "Piece Length: " << piece_length << std::endl;
     std::cout << "Piece Hashes: " << piece_hashes << std::endl;
 }
