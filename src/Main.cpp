@@ -3,6 +3,9 @@
 #include <vector>
 #include <cctype>
 #include <cstdlib>
+#include <fstream> 
+#include <sstream>
+#include <utility>
 
 #include "lib/nlohmann/json.hpp"
 
@@ -154,20 +157,6 @@ json decode_dictionary(const std::string &encoded_value, size_t &index) {
     return dict;
 }
 
-// json decode_bencoded_value(const std::string& encoded_value, size_t &index) { 
-//     if (encoded_value[index] == 'i') { 
-//         return decode_integer(encoded_value, index);
-//     } else if (isdigit(encoded_value[index])) { 
-//         return decode_string(encoded_value, index);
-//     } else if (encoded_value[index] == 'l') { 
-//         return decode_list(encoded_value, index);
-//     } else if (encoded_value[index] == 'd') { 
-//         return decode_dictionary(encoded_value, index);
-//     } else { 
-//         throw std::runtime_error("Invalid encodede value.");
-//     }
-// }
-
 json decode_value(const std::string &encoded_value, size_t &index) { 
     char type = encoded_value[index];
     switch (type) { 
@@ -191,6 +180,29 @@ json decode_bencoded_value(const std::string& encoded_value) {
     return decode_value(encoded_value, index);
 }
 
+// read entire content of a file into a string
+std::string read_file(const std::string &file_path) { 
+    std::ifstream file(file_path, std::ios::binary);
+    std::stringstream buff;
+    if(file) { 
+        buff << file.rdbuf();
+        file.close();
+        return buff.str();
+    } else { 
+        throw std::runtime_error("Failed to open file: " + file_path);
+    }
+}
+
+// parse torrent file, return tracker_url and length
+std::pair<std::string, int> parse_torrent(const std::string &file_path) { 
+    std::string content = read_file(file_path);
+    json decoded_torrent = decode_bencoded_value(content);
+
+    std::string tracker_url = decoded_torrent["announce"];
+    int length = decoded_torrent["info"]["length"];
+    return std::make_pair(tracker_url, length);
+}
+
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " decode <encoded_value>" << std::endl;
@@ -211,6 +223,21 @@ int main(int argc, char* argv[]) {
         std::string encoded_value = argv[2];
         json decoded_value = decode_bencoded_value(encoded_value);
         std::cout << decoded_value.dump() << std::endl;
+    } else if (command == "info") { 
+        if (argc < 3) { 
+            std::cerr << "Usage: " << argv[0] << " info <torrent_file> " << std::endl;
+            return 1;
+        }
+        try { 
+            std::string file_path = argv[2];
+            std::pair<std::string, int> decoded_values = parse_torrent(file_path);
+            
+            std::cout << "Tracker URL: " << decoded_values.first << std::endl;
+            std::cout << "Length: " << decoded_values.second << std::endl;
+        } catch (const std::exception &e) { 
+            std::cerr << "Error getting info: " << e.what() << std::endl;
+            return 1;
+        }
     } else {
         std::cerr << "unknown command: " << command << std::endl;
         return 1;
