@@ -7,7 +7,9 @@
 #include <sstream>
 #include <utility>
 
+#include "lib/sha1.hpp"
 #include "lib/nlohmann/json.hpp"
+
 
 using json = nlohmann::json;
 
@@ -194,14 +196,46 @@ std::string read_file(const std::string &file_path) {
 }
 
 // parse torrent file, return tracker_url and length
-std::pair<std::string, int> parse_torrent(const std::string &file_path) { 
+void parse_torrent(const std::string &file_path) { 
     std::string content = read_file(file_path);
     json decoded_torrent = decode_bencoded_value(content);
 
+    std::string bencoded_info = json_to_bencode(decoded_torrent["info"]);
+
+    SHA1 sha1;
+    sha1.update(bencoded_info);
+    std::string info_hash = sha1.final();
+    std::cout << "Info hash: " << info_hash << std::endl;
+
     std::string tracker_url = decoded_torrent["announce"];
     int length = decoded_torrent["info"]["length"];
-    return std::make_pair(tracker_url, length);
+    std::cout << "Tracker URL: " << tracker_url << std::endl;
+    std::cout << "Length: " << length << std::endl;
 }
+
+std::string json_to_bencode(const json &j) { 
+    std::ostringstream os;
+    if (j.is_object()) { 
+        os << 'd';
+        for (auto &el : j.items()) { 
+            os << el.key().size() << ':' << el.key() << json_to_bencode(el.value());
+        }
+        os << 'e';
+    } else if (j.is_array()) { 
+        os << 'l';
+        for (const json &item : j) { 
+            os << json_to_bencode(item);
+        }
+        os << 'e';
+    } else if (j.is_number_integer()) { 
+        os << 'i' << j.get<int>() << 'e';
+    } else if (j.is_string()) { 
+        const std::string &value = j.get<std::string>();
+        os << value.size() << ':' << value;
+    }
+    return os.str();
+}
+
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
@@ -230,10 +264,7 @@ int main(int argc, char* argv[]) {
         }
         try { 
             std::string file_path = argv[2];
-            std::pair<std::string, int> decoded_values = parse_torrent(file_path);
-            
-            std::cout << "Tracker URL: " << decoded_values.first << std::endl;
-            std::cout << "Length: " << decoded_values.second << std::endl;
+            parse_torrent(file_path);
         } catch (const std::exception &e) { 
             std::cerr << "Error getting info: " << e.what() << std::endl;
             return 1;
