@@ -144,7 +144,7 @@ json decode_bencoded_value(const std::string& encoded_value, size_t &index) {
 
 json decode_bencoded_value(const std::string& encoded_value) { 
     size_t index = 0; // start index for parsing
-    decode_bencoded_value(encoded_value, index);
+    return decode_bencoded_value(encoded_value, index);
 }
 
 int main(int argc, char* argv[]) {
