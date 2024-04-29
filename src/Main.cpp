@@ -97,18 +97,21 @@ json decode_integer(const std::string& encoded_value, size_t &index) {
     }
     else { 
         // i52e -> 52 or i-52e -> -52
-        std::string str = encoded_value.substr(1, encoded_value.size() - 2);
+        std::string str = encoded_value.substr(start, end);
+        index = end + 1;
         return json(std::stoll(str));
     }
 }
 
 json decode_string(const std::string& encoded_value, size_t &index) { 
     // Ex: 5:Hello -> Hello
-    size_t colon_index = encoded_value.find(':');
+    size_t colon_index = encoded_value.find(':', index);
     if (colon_index != std::string::npos) { 
-        std::string number_string = encoded_value.substr(0, colon_index);
+        std::string number_string = encoded_value.substr(index, colon_index - 1);
         int64_t number = std::atoll(number_string.c_str());
         std::string str = encoded_value.substr(colon_index + 1, number);
+
+        index = colon_index + 1 + number;
         return json(str);
     } else { 
         throw std::runtime_error("Invalid encoded value: " + encoded_value);
