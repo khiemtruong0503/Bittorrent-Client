@@ -19,14 +19,15 @@ int main() {
                 }
             }
             // get the string
-            string str;
+            string str = "\"";
             for(int i = found_element + 1; i <= found_element + string_number; ++i) { 
                 str += encoded_value[i];
             }
-            // str += '\"';
-            if(str.size() > 0) { 
+            str += '\"';
+            if(str.size() > 2) { 
                 ans += str;
             }
+            ans += str;
             ans += ',';
         }   
         else if(encoded_value[found_element] == 'i') { 
