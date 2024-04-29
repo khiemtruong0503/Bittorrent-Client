@@ -205,12 +205,13 @@ void parse_torrent(const std::string &file_path) {
     SHA1 sha1;
     sha1.update(bencoded_info);
     std::string info_hash = sha1.final();
-    std::cout << "Info Hash: " << info_hash;
+    
 
     std::string tracker_url = decoded_torrent["announce"];
     int length = decoded_torrent["info"]["length"];
-    // std::cout << "Tracker URL: " << tracker_url << std::endl;
-    // std::cout << "Length: " << length << std::endl;
+    std::cout << "Tracker URL: " << tracker_url << std::endl;
+    std::cout << "Length: " << length << std::endl;
+    std::cout << "Info Hash: " << info_hash;
 }
 
 std::string json_to_bencode(const json &j) { 
