@@ -89,6 +89,12 @@ using json = nlohmann::json;
 //     }
 // }
 
+json decode_integer(const std::string &, size_t &);
+json decode_string(const std::string &, size_t &);
+json decode_list(const std::string &, size_t &);
+json decode_dictionary(const std::string &, size_t &);
+json decode_value(const std::string &, size_t &);
+
 
 
 json decode_integer(const std::string& encoded_value, size_t &index) {
